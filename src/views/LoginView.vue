@@ -24,7 +24,7 @@ async function eseguiLogin() {
   } catch (e) {
     // Ora usiamo la 'e' per stamparla nella console per noi sviluppatori
     console.error('Dettaglio errore Firebase:', e)
-    // E mostriamo il messaggio generico all'utente
+    // E mostriamo il messaggio generico all'utente per avvertirlo dell'errore
     errore.value = 'Credenziali errate o connessione assente.'
   } finally {
     inCaricamento.value = false
