@@ -62,14 +62,3 @@ Per questo progetto, l'architettura di sicurezza è stata ribaltata:
 ### 6. State Management: YAGNI & KISS
 
 Per la gestione dello stato globale si è scelto deliberatamente di NON utilizzare librerie esterne come Pinia. Dato il dominio estremamente circoscritto (flusso unidirezionale Cameriere -> DB -> Cucina), l'uso di Vue Reactivity (ref, watch) accoppiato al localStorage è sufficiente per garantire la persistenza in-flight, mantenendo il bundle dell'app leggero ed evitando over-engineering.
-
-## 🚀 Setup e Installazione (Sviluppo Locale)
-
-Per eseguire questo progetto localmente o prepararlo per il deployment, segui questi passaggi:
-
-**1. Clona il repository:**
-
-```bash
-git clone [https://github.com/tuousername/chiosco-ordini.git](https://github.com/tuousername/chiosco-ordini.git)
-cd chiosco-ordini
-```
