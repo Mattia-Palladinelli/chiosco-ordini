@@ -305,7 +305,7 @@ function raggruppaPanini(panini) {
 }
 
 .comanda.card-asporto {
-  background-color: #fff0f4;
+  background-color: #fff8cc; /* Giallo paglierino che contrasta bene col bianco */
   border-left-color: #e91e63;
 }
 
