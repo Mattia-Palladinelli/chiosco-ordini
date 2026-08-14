@@ -72,6 +72,7 @@ function aggiungiAllOrdine(panino) {
     nome: panino.nome,
     senza_olio: false,
     origano: false,
+    note: '',
   })
 }
 
@@ -206,6 +207,15 @@ async function inviaOrdineInCucina() {
           >
             + Origano
           </button>
+        </div>
+        <div class="riga-note">
+          <input
+            type="text"
+            v-model="item.note"
+            placeholder="Note (es. ben cotto, diviso a metà...)"
+            maxlength="40"
+            class="input-note-panino"
+          />
         </div>
       </div>
     </div>
@@ -414,6 +424,26 @@ async function inviaOrdineInCucina() {
   background: #ff9800;
   color: white;
   border-color: #ff9800;
+}
+
+.riga-note {
+  margin-top: 10px;
+}
+
+.input-note-panino {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+  background-color: #fafafa;
+}
+
+.input-note-panino:focus {
+  border-color: #ff9800;
+  outline: none;
+  background-color: white;
 }
 
 .barra-inferiore {

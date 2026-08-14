@@ -117,7 +117,8 @@ function raggruppaPanini(panini) {
 
   panini.forEach((panino) => {
     // Creiamo una stringa unica che identifica questo esatto tipo di panino
-    const firma = `${panino.nome}|${panino.senza_olio}|${panino.origano}`
+    const notaPulita = panino.note || ''
+    const firma = `${panino.nome}|${panino.senza_olio}|${panino.origano}|${notaPulita}`
 
     if (!raggruppati[firma]) {
       // Se è la prima volta che incontriamo questa configurazione, la creiamo
@@ -126,6 +127,7 @@ function raggruppaPanini(panini) {
         nome: panino.nome,
         senza_olio: panino.senza_olio,
         origano: panino.origano,
+        note: notaPulita,
         quantita: 1,
       }
     } else {
@@ -188,6 +190,8 @@ function raggruppaPanini(panini) {
             <div class="note-varianti">
               <span v-if="gruppo.senza_olio" class="variante-rimossa">- Senza Olio</span>
               <span v-if="gruppo.origano" class="variante-aggiunta">+ Origano</span>
+              <!-- NUOVA RIGA: Mostriamo la nota solo se c'è testo -->
+              <span v-if="gruppo.note !== ''" class="nota-testo">📝 {{ gruppo.note }}</span>
             </div>
           </li>
         </ul>
@@ -302,6 +306,18 @@ function raggruppaPanini(panini) {
   display: flex;
   flex-direction: column;
   border-left: 8px solid #2196f3;
+}
+
+.nota-testo {
+  color: #555;
+  font-weight: bold;
+  font-style: italic;
+  font-size: 14px;
+  background-color: #fff8e1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 5px;
+  border: 1px solid #ffe082;
 }
 
 .comanda.card-asporto {
