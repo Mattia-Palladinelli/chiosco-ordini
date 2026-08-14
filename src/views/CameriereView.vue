@@ -15,11 +15,14 @@ const menu = ref([
   { id: 6, codice: '6', nome: 'Mortadella e Pecorino' },
   { id: 7, codice: '7', nome: 'Prosciutto Crudo, Pomodoro e Mozzarella' },
   { id: 8, codice: '8', nome: 'Prosciutto Crudo e Pecorino' },
-  { id: 9, codice: '9', nome: 'Prosciutto Crudo e Pomodoro' },
-  { id: 10, codice: '10', nome: 'Mortadella e Pomodoro' },
-  { id: 11, codice: '', nome: 'Pizzetta Rossa' },
-  { id: 12, codice: '', nome: 'Pizzetta Bianca' },
-  { id: 13, codice: '', nome: 'Focaccia bianca' },
+  { id: 9, codice: '', nome: 'Prosciutto Crudo e Pomodoro' },
+  { id: 10, codice: '', nome: 'Mortadella e Pomodoro' },
+  { id: 11, codice: '', nome: 'SOLO Pecorino' },
+  { id: 12, codice: '', nome: 'SOLO Pomodoro' },
+  { id: 13, codice: '', nome: 'SOLO Mozzarella' },
+  { id: 14, codice: '', nome: 'Pizzetta Rossa' },
+  { id: 15, codice: '', nome: 'Pizzetta Bianca' },
+  { id: 16, codice: '', nome: 'Focaccia bianca' },
 ])
 
 const ordineAttuale = ref([])
