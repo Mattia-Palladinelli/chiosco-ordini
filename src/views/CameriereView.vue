@@ -112,6 +112,7 @@ async function inviaOrdineInCucina() {
       stato: statoAssegnato, // Questo ci servirà per le due code in cucina
       timestamp: serverTimestamp(), // Usa l'ora esatta del server Google, non quella del telefono
       panini: paniniStatici, // L'intero array con panini e varianti
+      orario_ritiro: orarioRitiro.value,
     }
 
     // 2. Scriviamo su Firestore
