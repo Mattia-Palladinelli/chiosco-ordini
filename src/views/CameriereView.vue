@@ -28,6 +28,7 @@ const mostraRiepilogo = ref(false)
 const nomeCliente = ref('')
 // Nuova variabile per l'asporto (di base impostata su falso = consumazione sul posto)
 const daAsporto = ref(false)
+const orarioRitiro = ref('')
 
 // --- SISTEMA DI SALVATAGGIO IN CORSO (LOCALSTORAGE) ---
 
@@ -36,6 +37,8 @@ onMounted(() => {
   const ordineSalvato = localStorage.getItem('chiosco_ordine_corrente')
   const nomeSalvato = localStorage.getItem('chiosco_nome_corrente')
   const asportoSalvato = localStorage.getItem('chiosco_asporto_corrente')
+  const orarioSalvato = localStorage.getItem('chiosco_orario_corrente')
+  if (orarioSalvato) orarioRitiro.value = orarioSalvato
 
   if (ordineSalvato) ordineAttuale.value = JSON.parse(ordineSalvato)
   if (nomeSalvato) nomeCliente.value = nomeSalvato
@@ -58,6 +61,10 @@ watch(nomeCliente, (nuovoValore) => {
 
 watch(daAsporto, (nuovoValore) => {
   localStorage.setItem('chiosco_asporto_corrente', JSON.stringify(nuovoValore))
+})
+
+watch(orarioRitiro, (nuovoValore) => {
+  localStorage.setItem('chiosco_orario_corrente', nuovoValore)
 })
 
 // NOTA: Ricordati, dentro la funzione inviaOrdineInCucina(),
@@ -97,11 +104,12 @@ async function inviaOrdineInCucina() {
     // Trasformiamo il Proxy di Vue in una stringa e poi di nuovo in un oggetto base.
     // Questo crea una fotografia statica dei panini in questo esatto millisecondo.
     const paniniStatici = JSON.parse(JSON.stringify(ordineAttuale.value))
+    const statoAssegnato = orarioRitiro.value ? 'programmato' : 'attivo'
     // 1. Assembliamo il documento JSON perfetto
     const pacchettoOrdine = {
       cliente: nomeCliente.value.toUpperCase(),
       asporto: daAsporto.value,
-      stato: 'attivo', // Questo ci servirà per le due code in cucina
+      stato: statoAssegnato, // Questo ci servirà per le due code in cucina
       timestamp: serverTimestamp(), // Usa l'ora esatta del server Google, non quella del telefono
       panini: paniniStatici, // L'intero array con panini e varianti
     }
@@ -118,11 +126,13 @@ async function inviaOrdineInCucina() {
     nomeCliente.value = ''
     daAsporto.value = false
     mostraRiepilogo.value = false
+    orarioRitiro.value = ''
 
     // 5. PULIZIA MEMORIA DI EMERGENZA (Svuota il localStorage)
     localStorage.removeItem('chiosco_ordine_corrente')
     localStorage.removeItem('chiosco_nome_corrente')
     localStorage.removeItem('chiosco_asporto_corrente')
+    localStorage.removeItem('chiosco_orario_corrente')
   } catch (errore) {
     // Se salta il Wi-Fi e Firebase fallisce la cache locale, catturiamo l'errore
     console.error('Errore irreversibile di connessione: ', errore)
@@ -164,6 +174,11 @@ async function inviaOrdineInCucina() {
             placeholder="Es. Mario..."
             autocomplete="off"
           />
+        </div>
+
+        <div class="campo-input">
+          <label for="input-orario">🕒 Orario di Ritiro (Opzionale):</label>
+          <input id="input-orario" type="time" v-model="orarioRitiro" />
         </div>
 
         <div class="selettore-asporto">

@@ -1,10 +1,20 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { db } from '../firebase.js'
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, getDocs } from 'firebase/firestore'
+import {
+  collection,
+  query,
+  orderBy,
+  onSnapshot,
+  doc,
+  updateDoc,
+  getDocs,
+  serverTimestamp,
+} from 'firebase/firestore'
 
 const ordiniAttivi = ref([])
 const ordiniCompletati = ref([])
+const ordiniProgrammati = ref([])
 const schedaAttiva = ref('da_preparare')
 
 // 1. NUOVA VARIABILE PER IL CONTEGGIO
@@ -16,6 +26,7 @@ onMounted(() => {
   onSnapshot(q, (snapshot) => {
     const tempAttivi = []
     const tempCompletati = []
+    const tempProgrammati = []
     let conteggio = 0 // Inizializziamo il contatore a zero ad ogni aggiornamento
 
     snapshot.forEach((documento) => {
@@ -23,6 +34,9 @@ onMounted(() => {
 
       if (ordine.stato === 'attivo') {
         tempAttivi.push(ordine)
+      } else if (ordine.stato === 'programmato') {
+        // Intercettiamo gli ordini futuri
+        tempProgrammati.push(ordine)
       } else if (ordine.stato === 'completato') {
         tempCompletati.push(ordine)
         // Se è completato, sommiamo il numero di panini contenuti in questo ordine
@@ -33,6 +47,7 @@ onMounted(() => {
       }
     })
 
+    ordiniProgrammati.value = tempProgrammati
     ordiniAttivi.value = tempAttivi
     ordiniCompletati.value = tempCompletati.reverse()
 
@@ -47,6 +62,18 @@ async function chiudiOrdine(idFirebase) {
     await updateDoc(riferimentoOrdine, { stato: 'completato' })
   } catch (e) {
     console.error("Errore durante la chiusura dell'ordine:", e)
+  }
+}
+
+async function spostaInCoda(idFirebase) {
+  try {
+    const riferimentoOrdine = doc(db, 'ordini', idFirebase)
+    await updateDoc(riferimentoOrdine, {
+      stato: 'attivo',
+      timestamp: serverTimestamp(),
+    })
+  } catch (e) {
+    console.error('Errore nello spostamento:', e)
   }
 }
 
@@ -153,6 +180,12 @@ function raggruppaPanini(panini) {
         <!-- resto del codice... -->
         Da Preparare ({{ ordiniAttivi.length }})
       </button>
+      <button
+        @click="schedaAttiva = 'programmati'"
+        :class="['btn-scheda', { 'scheda-attiva': schedaAttiva === 'programmati' }]"
+      >
+        In Attesa ({{ ordiniProgrammati.length }})
+      </button>
 
       <button
         @click="schedaAttiva = 'storico'"
@@ -233,6 +266,43 @@ function raggruppaPanini(panini) {
         </div>
         <button @click="ripristinaOrdine(ordine.id)" class="btn-ripristina">↺ Ripristina</button>
       </div>
+    </section>
+
+    <!-- AREA 3: PROGRAMMATI -->
+    <section v-if="schedaAttiva === 'programmati'" class="area-scorrimento">
+      <div v-if="ordiniProgrammati.length === 0" class="coda-vuota">
+        Nessuna prenotazione futura.
+      </div>
+
+      <article
+        v-for="ordine in ordiniProgrammati"
+        :key="ordine.id"
+        class="comanda comanda-programmata"
+      >
+        <div class="comanda-header">
+          <div class="info-cliente">
+            <h2>{{ ordine.cliente }}</h2>
+            <span class="orario">Creato alle: {{ formattaOra(ordine.timestamp) }}</span>
+          </div>
+          <!-- Badge gigante per l'orario -->
+          <span class="badge-orario">RITIRO ALLE: {{ ordine.orario_ritiro }}</span>
+        </div>
+
+        <ul class="lista-panini">
+          <li v-for="gruppo in raggruppaPanini(ordine.panini)" :key="gruppo.id_firma">
+            <strong>{{ gruppo.quantita }}x {{ gruppo.nome }}</strong>
+            <div class="note-varianti">
+              <span v-if="gruppo.senza_olio" class="variante-rimossa">- Senza Olio</span>
+              <span v-if="gruppo.origano" class="variante-aggiunta">+ Origano</span>
+              <span v-if="gruppo.note !== ''" class="nota-testo">📝 {{ gruppo.note }}</span>
+            </div>
+          </li>
+        </ul>
+
+        <button @click="spostaInCoda(ordine.id)" class="btn-attiva">
+          ► INIZIA A PREPARARE ORA
+        </button>
+      </article>
     </section>
   </main>
 </template>
@@ -487,5 +557,32 @@ function raggruppaPanini(panini) {
 
 .btn-azzera:active {
   background-color: #e68a00;
+}
+
+.comanda-programmata {
+  background-color: #f3e5f5;
+  border-left: 8px solid #9c27b0;
+}
+
+.badge-orario {
+  background: #9c27b0;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: 900;
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-attiva {
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 18px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
 }
 </style>
