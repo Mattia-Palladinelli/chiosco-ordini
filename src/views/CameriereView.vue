@@ -32,6 +32,7 @@ const nomeCliente = ref('')
 // Nuova variabile per l'asporto (di base impostata su falso = consumazione sul posto)
 const daAsporto = ref(false)
 const orarioRitiro = ref('')
+const daPagare = ref(false)
 
 // --- SISTEMA DI SALVATAGGIO IN CORSO (LOCALSTORAGE) ---
 
@@ -41,8 +42,10 @@ onMounted(() => {
   const nomeSalvato = localStorage.getItem('chiosco_nome_corrente')
   const asportoSalvato = localStorage.getItem('chiosco_asporto_corrente')
   const orarioSalvato = localStorage.getItem('chiosco_orario_corrente')
+  const pagamentoSalvato = localStorage.getItem('chiosco_dapagare_corrente')
   if (orarioSalvato) orarioRitiro.value = orarioSalvato
 
+  if (pagamentoSalvato) daPagare.value = JSON.parse(pagamentoSalvato)
   if (ordineSalvato) ordineAttuale.value = JSON.parse(ordineSalvato)
   if (nomeSalvato) nomeCliente.value = nomeSalvato
   if (asportoSalvato) daAsporto.value = JSON.parse(asportoSalvato)
@@ -68,6 +71,10 @@ watch(daAsporto, (nuovoValore) => {
 
 watch(orarioRitiro, (nuovoValore) => {
   localStorage.setItem('chiosco_orario_corrente', nuovoValore)
+})
+
+watch(daPagare, (nuovoValore) => {
+  localStorage.setItem('chiosco_dapagare_corrente', JSON.stringify(nuovoValore))
 })
 
 // NOTA: Ricordati, dentro la funzione inviaOrdineInCucina(),
@@ -116,6 +123,7 @@ async function inviaOrdineInCucina() {
       timestamp: serverTimestamp(), // Usa l'ora esatta del server Google, non quella del telefono
       panini: paniniStatici, // L'intero array con panini e varianti
       orario_ritiro: orarioRitiro.value,
+      da_pagare: daPagare.value,
     }
 
     // 2. Scriviamo su Firestore
@@ -131,8 +139,10 @@ async function inviaOrdineInCucina() {
     daAsporto.value = false
     mostraRiepilogo.value = false
     orarioRitiro.value = ''
+    daPagare.value = false
 
     // 5. PULIZIA MEMORIA DI EMERGENZA (Svuota il localStorage)
+    localStorage.removeItem('chiosco_dapagare-corrente')
     localStorage.removeItem('chiosco_ordine_corrente')
     localStorage.removeItem('chiosco_nome_corrente')
     localStorage.removeItem('chiosco_asporto_corrente')
@@ -200,6 +210,23 @@ async function inviaOrdineInCucina() {
             :class="['btn-asporto', { 'selezionato-asporto': daAsporto }]"
           >
             🛍️ Da Asporto
+          </button>
+        </div>
+
+        <div class="selettore-asporto">
+          <!-- Ricicliamo la classe contenitore per coerenza -->
+          <button
+            @click="daPagare = false"
+            :class="['btn-asporto', { 'selezionato-pagato': !daPagare }]"
+          >
+            ✅ Pagato Subito
+          </button>
+
+          <button
+            @click="daPagare = true"
+            :class="['btn-asporto', { 'selezionato-debito': daPagare }]"
+          >
+            ⚠️ DA PAGARE
           </button>
         </div>
       </div>
@@ -503,5 +530,18 @@ async function inviaOrdineInCucina() {
   flex: 2;
   background-color: #4caf50;
   color: white;
+}
+
+/* Aggiunti questi colori per i nuovi bottoni */
+.selezionato-pagato {
+  background-color: white;
+  color: #4caf50;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.selezionato-debito {
+  background-color: white;
+  color: #f44336;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 </style>

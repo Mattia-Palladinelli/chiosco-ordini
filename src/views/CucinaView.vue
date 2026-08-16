@@ -86,6 +86,17 @@ async function ripristinaOrdine(idFirebase) {
   }
 }
 
+// Aggiungi questa funzione sotto a ripristinaOrdine()
+async function saldaConto(idFirebase) {
+  try {
+    const riferimentoOrdine = doc(db, 'ordini', idFirebase)
+    // Trasformiamo il debito in un pagamento saldato
+    await updateDoc(riferimentoOrdine, { da_pagare: false })
+  } catch (e) {
+    console.error('Errore durante il saldo del conto:', e)
+  }
+}
+
 // NUOVA FUNZIONE: Archivia tutti gli ordini completati visibili
 async function svuotaStorico() {
   // Chiediamo conferma per evitare misclick
@@ -258,13 +269,26 @@ function raggruppaPanini(panini) {
         </button>
       </div>
 
-      <div v-for="ordine in ordiniCompletati" :key="ordine.id" class="comanda-chiusa">
+      <div
+        v-for="ordine in ordiniCompletati"
+        :key="ordine.id"
+        :class="['comanda-chiusa', { 'card-da-pagare': ordine.da_pagare }]"
+      >
         <!-- ... (il resto della comanda-chiusa rimane identico) ... -->
         <div class="info-storico">
           <strong class="nome-storico">{{ ordine.cliente }}</strong>
           <span class="ora-chiusa">({{ formattaOra(ordine.timestamp) }})</span>
+          <!-- L'etichetta visibile solo se da_pagare è true -->
+          <span v-if="ordine.da_pagare" class="etichetta-debito">⚠️ DA PAGARE</span>
         </div>
-        <button @click="ripristinaOrdine(ordine.id)" class="btn-ripristina">↺ Ripristina</button>
+        <div class="azioni-storico">
+          <!-- Il tasto per saldare scompare automaticamente una volta premuto -->
+          <button v-if="ordine.da_pagare" @click="saldaConto(ordine.id)" class="btn-salda">
+            💰 SALDA
+          </button>
+
+          <button @click="ripristinaOrdine(ordine.id)" class="btn-ripristina">↺ Ripristina</button>
+        </div>
       </div>
     </section>
 
@@ -584,5 +608,34 @@ function raggruppaPanini(panini) {
   font-weight: bold;
   cursor: pointer;
   margin-top: 10px;
+}
+
+.card-da-pagare {
+  background-color: #ffebee; /* Rosso leggerissimo di sfondo */
+  border-left-color: #f44336 !important; /* Bordo rosso scuro */
+}
+
+.etichetta-debito {
+  color: #d32f2f;
+  font-weight: 900;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.azioni-storico {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-salda {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
 }
 </style>
