@@ -31,6 +31,10 @@ onMounted(() => {
 
     snapshot.forEach((documento) => {
       const ordine = { id: documento.id, ...documento.data() }
+      // 1. Filtriamo l'array per contare SOLO gli elementi che NON sono pizzette
+      const numeroPaniniVeri = ordine.panini.filter(
+        (panino) => panino.nome !== 'Pizzetta Rossa' && panino.nome !== 'Pizzetta Bianca',
+      ).length
 
       if (ordine.stato === 'attivo') {
         tempAttivi.push(ordine)
@@ -39,11 +43,11 @@ onMounted(() => {
         tempProgrammati.push(ordine)
       } else if (ordine.stato === 'completato') {
         tempCompletati.push(ordine)
-        // Se è completato, sommiamo il numero di panini contenuti in questo ordine
-        conteggio += ordine.panini.length
+        // Se è completato, sommiamo il numero di panini veri contenuti in questo ordine
+        conteggio += numeroPaniniVeri
       } else if (ordine.stato === 'archiviato') {
         // Se è archiviato (nascosto dallo storico), lo contiamo comunque ma NON lo mettiamo nella lista visiva
-        conteggio += ordine.panini.length
+        conteggio += numeroPaniniVeri
       }
     })
 
