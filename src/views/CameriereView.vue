@@ -21,7 +21,7 @@ const menu = ref([
   { id: 12, codice: '', nome: 'SOLO Pomodoro' },
   { id: 13, codice: '', nome: 'SOLO Mozzarella' },
   { id: 14, codice: '', nome: 'Pizzetta Rossa' },
-  { id: 15, codice: '', nome: 'Pizzetta Bianca' },
+  { id: 15, codice: '', nome: 'Pizzetta Patate' },
   { id: 16, codice: '', nome: 'Focaccia Bianca' },
   { id: 17, codice: '', nome: 'Mortadella, Pomodoro e Mozzarella' },
   { id: 18, codice: '', nome: 'Mortadella, Pomodoro e Pecorino' },
