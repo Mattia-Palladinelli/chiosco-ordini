@@ -33,7 +33,7 @@ onMounted(() => {
       const ordine = { id: documento.id, ...documento.data() }
       // 1. Filtriamo l'array per contare SOLO gli elementi che NON sono pizzette
       const numeroPaniniVeri = ordine.panini.filter(
-        (panino) => panino.nome !== 'Pizzetta Rossa' && panino.nome !== 'Pizzetta Bianca',
+        (panino) => panino.nome !== 'Pizzetta Rossa' && panino.nome !== 'Pizzetta Patate',
       ).length
 
       if (ordine.stato === 'attivo') {
