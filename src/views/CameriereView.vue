@@ -31,12 +31,17 @@ const menu = ref([
 
 const ordineAttuale = ref([])
 const mostraRiepilogo = ref(false)
-
 const nomeCliente = ref('')
 // Nuova variabile per l'asporto (di base impostata su falso = consumazione sul posto)
 const daAsporto = ref(false)
 const orarioRitiro = ref('')
 const daPagare = ref(false)
+/**
+ * Durante l'uso del gestionale è stato riscontrato un bug di mutua esclusione
+ * in fase di invio dell'ordine, questa sarà una variabile di lock per proteggere
+ * il pulsante "Invia in Cucina" da eventuali tocchi non desiderati
+ */
+const isInvioInCorso = ref(false)
 
 // --- SISTEMA DI SALVATAGGIO IN CORSO (LOCALSTORAGE) ---
 
@@ -106,7 +111,9 @@ function rimuoviPanino(indice) {
 
 // Aggiungiamo 'async' davanti alla funzione
 async function inviaOrdineInCucina() {
-  if (ordineAttuale.value.length === 0) return
+  // La condizione "isInvioInCorso.value" nell'or serve come blocco.
+  // Se l'invio è già in corso, ignora i tap successivi
+  if (isInvioInCorso.value || ordineAttuale.value.length === 0) return
 
   if (nomeCliente.value.trim() === '') {
     alert("Attenzione: Inserisci il nome del cliente prima di inviare l'ordine!")
@@ -114,6 +121,8 @@ async function inviaOrdineInCucina() {
   }
 
   try {
+    // CHIUSURA DEL LOCK
+    isInvioInCorso.value = true
     //  CLONAZIONE PROFONDA (Il fix per le sovrapposizioni)
     // Trasformiamo il Proxy di Vue in una stringa e poi di nuovo in un oggetto base.
     // Questo crea una fotografia statica dei panini in questo esatto millisecondo.
@@ -155,6 +164,9 @@ async function inviaOrdineInCucina() {
     // Se salta il Wi-Fi e Firebase fallisce la cache locale, catturiamo l'errore
     console.error('Errore irreversibile di connessione: ', errore)
     alert("Errore critico: impossibile salvare l'ordine.")
+  } finally {
+    // RIAPERTURA DEL LOCK
+    isInvioInCorso.value = false
   }
 }
 </script>
@@ -281,7 +293,13 @@ async function inviaOrdineInCucina() {
 
       <div v-if="mostraRiepilogo" class="pulsanti-riepilogo">
         <button @click="mostraRiepilogo = false" class="btn-azione btn-indietro">← Aggiungi</button>
-        <button @click="inviaOrdineInCucina()" class="btn-azione btn-invia">INVIA IN CUCINA</button>
+        <button
+          @click="inviaOrdineInCucina()"
+          :disabled="isInvioInCorso"
+          :class="['btn-azione', 'btn-invia', { 'bottone-bloccato': isInvioInCorso }]"
+        >
+          {{ isInvioInCorso ? '⏳ INVIO...' : 'INVIA IN CUCINA' }}
+        </button>
       </div>
     </footer>
   </main>
@@ -534,6 +552,13 @@ async function inviaOrdineInCucina() {
   flex: 2;
   background-color: #4caf50;
   color: white;
+}
+
+.bottone-bloccato {
+  background-color: #9e9e9e !important; /* Grigio spento */
+  cursor: not-allowed;
+  opacity: 0.8;
+  transform: none !important; /* Disabilita eventuali effetti di pressione */
 }
 
 /* Aggiunti questi colori per i nuovi bottoni */
