@@ -38,8 +38,8 @@ const orarioRitiro = ref('')
 const daPagare = ref(false)
 /**
  * Durante l'uso del gestionale è stato riscontrato un bug di mutua esclusione
- * in fase di invio dell'ordine, questa sarà una variabile di lock per proteggere
- * il pulsante "Invia in Cucina" da eventuali tocchi non desiderati
+ * in fase di invio dell'ordine, isInvioInCorso sarà una variabile di lock per proteggere
+ * il pulsante "Invia in Cucina" da eventuali tocchi indesiderati
  */
 const isInvioInCorso = ref(false)
 
