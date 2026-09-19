@@ -7,20 +7,26 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 // Abbiamo separato il 'codice' dal 'nome' pulito.
 // Le pizzette e la focaccia non hanno codice, quindi lo lasciamo vuoto.
 const menu = ref([
-  { id: 1, codice: '', nome: 'Mortadella' },
-  { id: 2, codice: '', nome: 'Prosciutto Crudo' },
-  { id: 3, codice: '', nome: 'Mortadella e Mozzarella' },
-  { id: 4, codice: '', nome: 'Prosciutto Crudo e Mozzarella' },
-
-  { id: 6, codice: '', nome: 'Mortadella e Pecorino' },
-
-  { id: 8, codice: '', nome: 'Prosciutto Crudo e Pecorino' },
-
+  { id: 1, codice: '1', nome: 'Mortadella' },
+  { id: 2, codice: '2', nome: 'Prosciutto Crudo' },
+  { id: 3, codice: '3', nome: 'Mortadella e Mozzarella' },
+  { id: 4, codice: '4', nome: 'Prosciutto Crudo e Mozzarella' },
+  { id: 5, codice: '5', nome: 'Pomodoro e Mozzarella' },
+  { id: 6, codice: '6', nome: 'Mortadella e Pecorino' },
+  { id: 7, codice: '7', nome: 'Prosciutto Crudo, Pomodoro e Mozzarella' },
+  { id: 8, codice: '8', nome: 'Prosciutto Crudo e Pecorino' },
+  { id: 9, codice: '', nome: 'Prosciutto Crudo e Pomodoro' },
+  { id: 10, codice: '', nome: 'Mortadella e Pomodoro' },
   { id: 11, codice: '', nome: 'SOLO Pecorino' },
-
+  { id: 12, codice: '', nome: 'SOLO Pomodoro' },
   { id: 13, codice: '', nome: 'SOLO Mozzarella' },
-
+  { id: 14, codice: '', nome: 'Pizzetta Rossa' },
+  { id: 15, codice: '', nome: 'Pizzetta Patate' },
   { id: 16, codice: '', nome: 'Focaccia Bianca' },
+  { id: 17, codice: '', nome: 'Mortadella, Pomodoro e Mozzarella' },
+  { id: 18, codice: '', nome: 'Mortadella, Pomodoro e Pecorino' },
+  { id: 19, codice: '', nome: 'Prosciutto Crudo, Pomodoro e Pecorino' },
+  { id: 20, codice: '', nome: 'Pomodoro e Pecorino' },
 ])
 
 const ordineAttuale = ref([])
