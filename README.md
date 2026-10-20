@@ -62,7 +62,11 @@ Per velocizzare la presa dell'ordine, i bottoni del cameriere mostrano un ID num
 
 In un DB NoSQL, cancellare massivamente i documenti dal client è inefficiente e insicuro. Per pulire la "Coda Storico" o chiudere la giornata, l'app non lancia comandi di `DELETE`. Utilizza un sistema a stati (`attivo` -> `completato` -> `archiviato` -> `azzerato`), aggiornando solo il flag del documento. L'interfaccia reattiva filtra gli stati, mantenendo i dati intatti nel backend per future implementazioni analitiche.
 
-### 5. Sicurezza: Il Falso Mito del Frontend (Backend-First Security)
+### 5. UI/UX Difensiva (Limiti di input)
+
+I campi di testo libero (come le note libere del cameriere) hanno un impatto trascurabile a livello di allocazione memoria in JavaScript e Firestore (che gestisce fino a 1MB per documento), ma possono devastare il CSS del front-end. L'uso strategico di attributi maxlength tutela l'integrità strutturale dell'interfaccia visiva in cucina, evitando che stringhe troppo lunghe aumentino il carico cognitivo dei cuochi.
+
+### 6. Sicurezza: Il Falso Mito del Frontend (Backend-First Security)
 
 Un errore comune nello sviluppo di SPA è affidare la sicurezza esclusivamente al framework frontend (es. nascondendo i bottoni o bloccando gli URL in Vue). Tuttavia, il frontend è un ambiente _untrusted_.
 Per questo progetto, l'architettura di sicurezza è stata ribaltata:
@@ -70,6 +74,6 @@ Per questo progetto, l'architettura di sicurezza è stata ribaltata:
 1.  **Autorizzazione Server-Side (Zero Trust):** Non basta controllare genericamente se un utente è autenticato (`request.auth != null`), poiché le API di Firebase Auth consentirebbero la registrazione pubblica di account non autorizzati scavalcando il frontend. Per evitare la creazione di account fantasma e la successiva iniezione di dati, le regole di Firestore impongono il Principio del Minimo Privilegio verificando l'identità esatta dell'operatore (`request.auth.token.email == "staff@chiosco.it"`). Qualsiasi altra richiesta viene crittograficamente scartata.
 2.  **Autenticazione Client-Side (UX & Flow):** La schermata di Login e le Router Guards di Vue agiscono unicamente come orchestratori dell'esperienza utente. Per evitare falsi logout causati dal tempo di lettura del token JWT dalla memoria locale (Race Condition durante il refresh di pagina), il Router implementa un costrutto a Promise (`attendiAuth()`) che congela la navigazione finché l'SDK di Firebase non ha terminato il ripristino sicuro della sessione.
 
-### 6. State Management: YAGNI & KISS
+### 7. State Management: YAGNI & KISS
 
 Per la gestione dello stato globale si è scelto deliberatamente di NON utilizzare librerie esterne come Pinia. Dato il dominio estremamente circoscritto (flusso unidirezionale Cameriere -> DB -> Cucina), l'uso di Vue Reactivity (ref, watch) accoppiato al localStorage è sufficiente per garantire la persistenza in-flight, mantenendo il bundle dell'app leggero ed evitando over-engineering.
