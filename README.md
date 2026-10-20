@@ -17,11 +17,22 @@ Sviluppata con un approccio **Mobile-First** e **Offline-First**, l'applicazione
 
 ## ✨ Core Features
 
-- **Architettura a Ruoli Segregati:** Schermata Home che smista l'utente verso la vista `Cameriere` (composizione ordine) o `Cucina` (ricezione e gestione).
-- **Sincronizzazione Real-Time (Push-based):** La cucina riceve i nuovi ordini istantaneamente tramite WebSocket (`onSnapshot`), eliminando la necessità di polling o aggiornamenti manuali.
-- **Gestione Varianti e Asporto:** Tagging visivo immediato per ordini "Da Asporto" (codice colore rosso) e gestione granulare delle varianti per singolo prodotto (es. "Senza Olio", "+ Origano").
-- **Statistiche di Giornata:** Contatore dinamico dei prodotti preparati, con sistema di "soft-delete" (stati `archiviato` e `azzerato`) per ripulire lo schermo senza perdere i dati storici sul database.
-- **Sicurezza Backend-First:** Sistema di autenticazione tramite Service Account interno. La protezione non si limita a nascondere le pagine web (tramite Router Guards protetti da Promise asincrone), ma blinda le API lato server tramite Firestore Security Rules, prevenendo l'iniezione di dati malevoli.
+- **Architettura a Ruoli Segregati:**
+  Schermata Home che smista l'utente verso la vista `Cameriere` (composizione ordine) o `Cucina` (ricezione e gestione).
+- **Sincronizzazione Real-Time (Push-based):**
+  La cucina riceve i nuovi ordini istantaneamente tramite WebSocket (`onSnapshot`), eliminando la necessità di polling o aggiornamenti manuali.
+- **Gestione note varianti e asporto:**
+  Tagging visivo immediato per ordini "Da Asporto" (codice colore rosso), gestione granulare delle varianti predefinite (es. "Senza Olio") e inserimento di note testuali libere a lunghezza controllata.
+- **Coda Differita (Pre-ordini):**
+  Sistema di scheduling per ordini futuri con parcheggio in una coda "In Attesa" isolata in cucina, attivabile manualmente per il passaggio alla produzione.
+- **Statistiche di Giornata:**
+  Contatore dinamico dei prodotti preparati, con sistema di "soft-delete" (stati `archiviato` e `azzerato`) per ripulire lo schermo senza perdere i dati storici sul database.
+- **Gestione Pagamenti sospesi:**
+  Tracking dei pagamenti differiti in cassa con evidenza visiva (alert "DA PAGARE") e sistema di saldo a posteriori per chiudere il ciclo contabile.
+- **Statistiche e Analitiche di giornata**
+  Contatore dinamico dei prodotti preparati (con filtri analitici per escludere dal conteggio matematico prodotti fuori scala come le pizzette), supportato da un sistema di "soft-delete" (stati archiviato e azzerato) per ripulire lo schermo senza perdere i dati storici sul database.
+- **Sicurezza Backend-First:**
+  Sistema di autenticazione tramite Service Account interno. La protezione non si limita a nascondere le pagine web (tramite Router Guards protetti da Promise asincrone), ma blinda le API lato server tramite Firestore Security Rules, prevenendo l'iniezione di dati malevoli.
 
 ## 🧠 Scelte Progettuali (Domain-Driven Design)
 
